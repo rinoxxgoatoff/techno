@@ -18,16 +18,28 @@
     font-family: 'Montserrat', sans-serif;
   }
 
+  /* ── CORRECTION CADRAGE ──────────────────────────────────────────────────
+     Le viewport est un conteneur relatif.
+     Le scaler est positionné en haut-gauche avec transform-origin: top left.
+     Le script calcule la translation pour le centrer après mise à l'échelle.
+     → transform: translate(offsetX, offsetY) scale(s)
+     Ainsi l'élément reste dans son espace DOM original (top:0 left:0)
+     mais est visuellement centré et à l'échelle correcte.
+  ─────────────────────────────────────────────────────────────────────────── */
   #viewport {
-    width: 100vw; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
+    width: 100vw;
+    height: 100vh;
     position: relative;
+    overflow: hidden;
   }
 
   #scaler {
-    width: 1280px; height: 720px;
-    transform-origin: center center;
-    position: relative;
+    width: 1280px;
+    height: 720px;
+    transform-origin: top left;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   .slide {
@@ -101,7 +113,6 @@
     border-radius: 16px;
   }
 
-  /* component boxes used in SVGs */
   .component-box { fill: #1e293b; stroke-width: 4; }
   .component-text {
     fill: #ffffff;
@@ -116,7 +127,6 @@
     text-anchor: middle;
   }
 
-  /* flow animation */
   .energy-flow {
     stroke-dasharray: 20 10;
     animation: flowAnim 1s linear infinite;
@@ -130,17 +140,14 @@
     to   { stroke-dashoffset: 0;  }
   }
 
-  /* speedometer */
   .speedometer-bg   { fill: none; stroke: #334155; stroke-width: 8; }
   .speedometer-fill { fill: none; stroke: #ff6b6b; stroke-width: 8; stroke-dasharray: 100 200; }
 
-  /* slide-specific component states */
   .active-green { stroke: #00d084; filter: drop-shadow(0 0 12px rgba(0,208,132,.5)); }
   .active-orange{ stroke: #ff6b6b; filter: drop-shadow(0 0 12px rgba(255,107,107,.5)); }
   .inactive-box { stroke: #475569; fill: #0f172a; opacity: 0.7; }
   .inactive-text{ fill: #64748b; }
 
-  /* legend items */
   .legend-item {
     display: flex; align-items: center;
     margin-bottom: 16px;
@@ -197,15 +204,11 @@
 <div id="viewport">
   <div id="scaler">
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 1 — TITLE                                                  -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 1 — TITLE -->
     <div class="slide p-10">
-      <!-- corner deco -->
       <div class="absolute top-0 right-0 w-64 h-64 opacity-10 pointer-events-none">
         <svg fill="none" viewBox="0 0 100 100"><circle cx="100" cy="0" r="80" stroke="#0099ff" stroke-width="20"/><circle cx="100" cy="0" r="50" stroke="#00d084" stroke-width="10"/></svg>
       </div>
-      <!-- header -->
       <div class="flex flex-col items-center justify-center mt-6 mb-8 text-center z-10 flex-none">
         <div class="mb-4 bg-gray-800 border-2 border-blue-500 px-6 py-2 rounded-full">
           <p class="text-blue-400 text-lg font-bold tracking-wider uppercase">Sciences &amp; Technologie — Classe de 3e</p>
@@ -217,7 +220,6 @@
           Les 6 moments importants pendant un trajet
         </p>
       </div>
-      <!-- diagram -->
       <div class="flex-1 flex justify-center items-center relative w-full">
         <svg height="450" viewBox="0 0 1000 450" width="1000" xmlns="http://www.w3.org/2000/svg">
           <line stroke="#334155" stroke-width="6" x1="50" x2="950" y1="400" y2="400"/>
@@ -232,19 +234,16 @@
           <line stroke="#94a3b8" stroke-dasharray="10,10" stroke-width="12" x1="500" x2="700" y1="320" y2="320"/>
           <line stroke="#94a3b8" stroke-width="10" x1="300" x2="300" y1="280" y2="320"/>
           <line stroke="#94a3b8" stroke-width="10" x1="500" x2="500" y1="280" y2="320"/>
-          <!-- Moteur Essence -->
           <g transform="translate(180,160)">
             <rect class="component-box" height="120" rx="15" stroke="#ff6b6b" width="240" x="0" y="0"/>
             <text style="fill:#ff6b6b;font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;text-anchor:middle" x="120" y="55">MOTEUR</text>
             <text style="fill:#ff6b6b;font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;text-anchor:middle" x="120" y="85">ESSENCE</text>
           </g>
-          <!-- Moteur Électrique -->
           <g transform="translate(450,160)">
             <rect class="component-box" height="120" rx="15" stroke="#00d084" width="240" x="0" y="0"/>
             <text style="fill:#00d084;font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;text-anchor:middle" x="120" y="55">MOTEUR</text>
             <text style="fill:#00d084;font-family:'Montserrat',sans-serif;font-size:24px;font-weight:700;text-anchor:middle" x="120" y="85">ÉLECTRIQUE</text>
           </g>
-          <!-- Batterie -->
           <g transform="translate(730,170)">
             <rect class="component-box" height="100" rx="10" stroke="#0099ff" width="160" x="0" y="0"/>
             <rect fill="#0099ff" height="15" rx="3" width="40" x="60" y="-15"/>
@@ -254,7 +253,6 @@
           <path d="M730,220 L690,220" fill="none" stroke="#0099ff" stroke-linecap="round" stroke-width="8"/>
           <polygon fill="#0099ff" points="690,210 670,220 690,230"/>
         </svg>
-        <!-- legend -->
         <div class="absolute bottom-6 right-8 bg-gray-800 bg-opacity-90 p-5 rounded-xl border-2 border-gray-600 shadow-2xl">
           <h3 class="text-lg font-bold text-white uppercase mb-3 border-b border-gray-600 pb-2">Légende</h3>
           <div class="flex items-center mb-3"><div class="w-6 h-6 rounded-full bg-red-500 mr-3"></div><p class="text-lg text-gray-200 font-semibold">Essence</p></div>
@@ -262,7 +260,6 @@
           <div class="flex items-center"><div class="w-6 h-6 rounded-full bg-blue-500 mr-3"></div><p class="text-lg text-gray-200 font-semibold">Batterie</p></div>
         </div>
       </div>
-      <!-- footer -->
       <div class="mt-2 border-t-2 border-gray-700 pt-4 flex justify-between items-center flex-none">
         <div>
           <p class="text-blue-400 text-lg font-bold mb-1">Objectif de la leçon :</p>
@@ -271,12 +268,9 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 2 — INTRODUCTION                                           -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 2 — INTRODUCTION -->
     <div class="slide p-12">
       <div class="grid-overlay"></div>
-      <!-- header -->
       <div class="mb-6 z-10 relative">
         <div class="flex justify-between items-start">
           <div class="w-4/5">
@@ -291,7 +285,6 @@
           <div class="text-right"><p class="text-5xl font-bold text-gray-700 opacity-40">02</p></div>
         </div>
       </div>
-      <!-- diagram + legend -->
       <div class="flex-1 flex relative z-10 bg-gray-900 bg-opacity-40 rounded-xl border border-gray-700 p-6">
         <div class="w-80 pr-8 border-r border-gray-700 flex flex-col justify-center">
           <h3 class="text-lg font-bold text-gray-400 uppercase mb-6 tracking-wider">Les 4 éléments</h3>
@@ -302,33 +295,28 @@
         </div>
         <div class="flex-1 relative flex items-center justify-center pl-6">
           <svg height="400" viewBox="0 0 800 400" width="800" xmlns="http://www.w3.org/2000/svg">
-            <!-- connections -->
             <path fill="none" stroke="#0099ff" stroke-linecap="round" stroke-width="8" d="M220 280 L310 280"/>
             <polygon fill="#0099ff" points="295,270 315,280 295,290"/>
             <path fill="none" stroke="#00d084" stroke-linecap="round" stroke-width="8" d="M490 280 L535 280 L535 200"/>
             <path fill="none" stroke="#ff6b6b" stroke-linecap="round" stroke-width="8" d="M490 100 L535 100 L535 200"/>
             <path fill="none" stroke="#95a5a6" stroke-linecap="round" stroke-width="8" d="M535 200 L590 200"/>
             <polygon fill="#95a5a6" points="575,190 595,200 575,210"/>
-            <!-- Batterie -->
             <g transform="translate(40,220)">
               <rect fill="#1e293b" height="120" rx="15" stroke="#0099ff" stroke-width="4" style="filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))" width="180" x="0" y="0"/>
               <rect fill="#0099ff" height="30" rx="2" width="10" x="175" y="45"/>
               <text class="component-text" x="90" y="60">Batterie</text>
               <path d="M80 85 L90 85 L85 95 L95 95 L85 110 L88 98 L78 98 Z" fill="#0099ff"/>
             </g>
-            <!-- Moteur Électrique -->
             <g transform="translate(310,220)">
               <rect fill="#1e293b" height="120" rx="15" stroke="#00d084" stroke-width="4" style="filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))" width="180" x="0" y="0"/>
               <text class="component-text" x="90" y="45">Moteur</text>
               <text class="component-text" x="90" y="75">électrique</text>
             </g>
-            <!-- Moteur Essence -->
             <g transform="translate(310,40)">
               <rect fill="#1e293b" height="120" rx="15" stroke="#ff6b6b" stroke-width="4" style="filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))" width="180" x="0" y="0"/>
               <text class="component-text" x="90" y="45">Moteur</text>
               <text class="component-text" x="90" y="75">à essence</text>
             </g>
-            <!-- Roues -->
             <g transform="translate(600,140)">
               <rect fill="#1e293b" height="120" rx="15" stroke="#95a5a6" stroke-width="4" style="filter:drop-shadow(0 6px 8px rgba(0,0,0,.4))" width="160" x="0" y="0"/>
               <text class="component-text" x="80" y="40">Roues</text>
@@ -346,11 +334,8 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 3 — PHASE 1 : AU DÉMARRAGE                                 -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 3 — PHASE 1 : AU DÉMARRAGE -->
     <div class="slide p-12">
-      <!-- header -->
       <div class="flex justify-between items-center mb-6 z-10 relative">
         <div>
           <h2 class="text-5xl font-extrabold tracking-tight text-white mb-2">1. Au démarrage</h2>
@@ -358,9 +343,7 @@
         </div>
         <div class="text-right"><p class="text-6xl font-black text-gray-700 opacity-40">01</p></div>
       </div>
-      <!-- content -->
       <div class="flex flex-1 gap-10 mt-2">
-        <!-- left -->
         <div class="w-2/5 flex flex-col justify-center gap-8">
           <div class="info-card p-8">
             <h3 class="text-3xl font-bold text-white mb-6 border-b-2 border-gray-700 pb-4">Comment ça marche ?</h3>
@@ -379,35 +362,28 @@
             </div>
           </div>
         </div>
-        <!-- right SVG -->
         <div class="w-3/5 info-card relative flex items-center justify-center p-6">
           <svg height="100%" viewBox="0 0 800 500" width="100%" xmlns="http://www.w3.org/2000/svg">
-            <!-- inactive: essence to wheels -->
             <path d="M200 310 L200 420 L315 420" fill="none" stroke="#334155" stroke-linecap="round" stroke-linejoin="round" stroke-width="10"/>
-            <!-- active flows -->
             <path class="energy-flow" d="M600 150 L600 200" fill="none" stroke="#00d084" stroke-width="16"/>
             <polygon fill="#00d084" points="580,185 620,185 600,215"/>
             <path class="energy-flow" d="M600 330 L600 420 L515 420" fill="none" stroke="#00d084" stroke-linejoin="round" stroke-width="16"/>
             <polygon fill="#00d084" points="530,400 530,440 500,420"/>
-            <!-- Moteur Essence inactive -->
             <g transform="translate(60,210)">
               <rect fill="#0f172a" height="120" rx="16" stroke="#475569" stroke-width="4" width="280" x="0" y="0"/>
               <text fill="#64748b" font-size="28" font-weight="bold" text-anchor="middle" x="140" y="50">Moteur Essence</text>
               <text fill="#ef4444" font-size="24" font-weight="bold" text-anchor="middle" x="140" y="90">ARRÊTÉ</text>
             </g>
-            <!-- Batterie active -->
             <g transform="translate(460,40)">
               <rect fill="#1e293b" height="110" rx="16" stroke="#00d084" stroke-width="4" width="280" x="0" y="0"/>
               <rect fill="#00d084" height="40" rx="6" width="20" x="280" y="35"/>
               <text fill="#ffffff" font-size="32" font-weight="bold" text-anchor="middle" x="140" y="65">Batterie (pleine)</text>
             </g>
-            <!-- Moteur Électrique active -->
             <g transform="translate(460,210)">
               <rect fill="#1e293b" height="120" rx="16" stroke="#00d084" stroke-width="4" width="280" x="0" y="0"/>
               <text fill="#ffffff" font-size="30" font-weight="bold" text-anchor="middle" x="140" y="55">Moteur</text>
               <text fill="#ffffff" font-size="30" font-weight="bold" text-anchor="middle" x="140" y="95">Électrique</text>
             </g>
-            <!-- Roues -->
             <g transform="translate(325,380)">
               <rect fill="#1e293b" height="30" stroke="#334155" stroke-width="4" width="100" x="25" y="25"/>
               <circle cx="25" cy="40" fill="#0f172a" r="45" stroke="#ffffff" stroke-width="8"/>
@@ -421,18 +397,13 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 4 — PHASE 2 : EN VILLE                                      -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 4 — PHASE 2 : EN VILLE -->
     <div class="slide" style="padding:3rem 4rem">
-      <!-- header -->
       <div class="flex items-center mb-10">
         <div class="bg-green-500 text-white rounded-full w-20 h-20 flex items-center justify-center text-4xl font-bold mr-6 shadow-lg flex-shrink-0">2</div>
         <h1 class="text-6xl font-bold tracking-tight">En ville</h1>
       </div>
-      <!-- content -->
       <div class="flex flex-1 gap-10">
-        <!-- left -->
         <div class="w-2/5 flex flex-col justify-center gap-8">
           <div class="info-card p-10 shadow-xl">
             <p class="text-4xl font-semibold leading-relaxed mb-8 text-white">
@@ -447,10 +418,8 @@
             <p class="text-3xl font-bold text-blue-100">C'est aussi très silencieux.</p>
           </div>
         </div>
-        <!-- right SVG -->
         <div class="w-3/5 flex items-center justify-center p-6 shadow-xl" style="background:#0f172a;border:4px solid #1e293b;border-radius:1rem">
           <svg height="100%" viewBox="0 0 800 500" width="100%" xmlns="http://www.w3.org/2000/svg">
-            <!-- city -->
             <g transform="translate(40,40)">
               <rect fill="#334155" height="60" rx="4" width="40" x="0" y="40"/>
               <rect fill="#475569" height="90" rx="4" width="50" x="50" y="10"/>
@@ -462,30 +431,23 @@
             </g>
             <text fill="white" font-size="34" font-weight="bold" x="210" y="80">EN VILLE</text>
             <text fill="#00d084" font-size="26" font-weight="bold" x="210" y="125">Vitesse : 30 km/h</text>
-            <!-- Essence inactive -->
             <rect fill="#0f172a" height="130" rx="15" stroke="#475569" stroke-dasharray="8,6" stroke-width="6" width="240" x="500" y="30"/>
             <text fill="#64748b" font-size="28" font-weight="bold" text-anchor="middle" x="620" y="85">Moteur</text>
             <text fill="#64748b" font-size="28" font-weight="bold" text-anchor="middle" x="620" y="120">Essence</text>
             <rect fill="#ef4444" height="30" rx="8" width="80" x="580" y="135"/>
             <text fill="white" font-size="20" font-weight="bold" text-anchor="middle" x="620" y="157">ARRÊTÉ</text>
-            <!-- inactive conn -->
             <path d="M620 170 L620 220 L730 220 L730 280" fill="none" stroke="#475569" stroke-dasharray="12,12" stroke-width="8" opacity="0.5"/>
-            <!-- Batterie -->
             <rect fill="#1e293b" height="140" rx="15" stroke="#00d084" stroke-width="8" width="220" x="20" y="300"/>
             <text fill="white" font-size="30" font-weight="bold" text-anchor="middle" x="130" y="360">Batterie</text>
             <rect fill="#0f172a" height="24" rx="12" width="140" x="60" y="390"/>
             <rect fill="#00d084" height="24" rx="12" width="100" x="60" y="390"/>
-            <!-- arrow batterie → moteur élec -->
             <line stroke="#00d084" stroke-width="16" x1="250" x2="330" y1="370" y2="370"/>
             <polygon fill="#00d084" points="330,345 370,370 330,395"/>
-            <!-- Moteur Électrique -->
             <rect fill="#1e293b" height="140" rx="15" stroke="#00d084" stroke-width="8" width="220" x="380" y="300"/>
             <text fill="white" font-size="30" font-weight="bold" text-anchor="middle" x="490" y="355">Moteur</text>
             <text fill="#00d084" font-size="30" font-weight="bold" text-anchor="middle" x="490" y="395">Électrique</text>
-            <!-- arrow → roues -->
             <line stroke="#00d084" stroke-width="16" x1="610" x2="650" y1="370" y2="370"/>
             <polygon fill="#00d084" points="650,345 690,370 650,395"/>
-            <!-- Roues -->
             <rect fill="#1e293b" height="140" rx="15" stroke="#94a3b8" stroke-width="8" width="80" x="700" y="300"/>
             <circle cx="740" cy="340" fill="#cbd5e1" r="22"/>
             <circle cx="740" cy="400" fill="#cbd5e1" r="22"/>
@@ -495,21 +457,16 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 5 — PHASE 3 : ACCÉLÉRATION                                 -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 5 — PHASE 3 : ACCÉLÉRATION -->
     <div class="slide p-12">
       <div class="grid-overlay"></div>
-      <!-- header -->
       <div class="flex justify-between items-center mb-6 z-10 relative">
         <div class="flex items-center">
           <p class="bg-red-900 text-red-200 px-4 py-2 rounded-lg text-xl font-bold tracking-wider uppercase mr-5">Phase 3</p>
           <h2 class="text-5xl font-extrabold tracking-tight">3. Quand on accélère</h2>
         </div>
       </div>
-      <!-- content -->
       <div class="flex flex-1 gap-10 mt-2">
-        <!-- left -->
         <div class="w-1/3 flex flex-col gap-8 justify-center">
           <div class="info-card p-10 rounded-2xl border-l-8 border-red-500 shadow-2xl">
             <p class="text-4xl font-bold text-white mb-6 leading-tight">Les deux moteurs peuvent travailler ensemble.</p>
@@ -520,9 +477,7 @@
             <div><p class="text-3xl font-bold text-white">Puissance</p><p class="text-3xl font-bold text-red-400">Maximum</p></div>
           </div>
         </div>
-        <!-- right SVG -->
         <div class="w-2/3 info-card rounded-2xl relative flex items-center justify-center p-6 bg-opacity-40">
-          <!-- power meter -->
           <div class="absolute top-6 right-8 w-64 bg-gray-900 p-4 rounded-xl border border-gray-700">
             <div class="flex justify-between text-xl text-gray-300 mb-2 font-bold">
               <p>Énergie envoyée</p><p class="text-red-400">100%</p>
@@ -536,34 +491,27 @@
               <marker id="ag" markerHeight="5" markerWidth="5" orient="auto-start-reverse" refX="7" refY="5" viewBox="0 0 10 10"><path d="M0 1 L8 5 L0 9z" fill="#00d084"/></marker>
               <marker id="ar" markerHeight="5" markerWidth="5" orient="auto-start-reverse" refX="7" refY="5" viewBox="0 0 10 10"><path d="M0 1 L8 5 L0 9z" fill="#ff6b6b"/></marker>
             </defs>
-            <!-- Batterie → Moteur élec -->
             <path d="M600,120 L600,170" fill="none" stroke="#00d084" stroke-opacity="0.3" stroke-width="16"/>
             <path class="energy-flow" d="M600,120 L600,165" fill="none" stroke="#00d084" stroke-width="16"/>
-            <!-- Moteur élec → Roues -->
             <path d="M550,290 L450,360" fill="none" stroke="#00d084" stroke-opacity="0.3" stroke-width="20"/>
             <path class="energy-flow" d="M550,290 L455,356" fill="none" stroke="#00d084" stroke-width="20"/>
-            <!-- Essence → Roues -->
             <path d="M250,290 L350,360" fill="none" stroke="#ff6b6b" stroke-opacity="0.3" stroke-width="20"/>
             <path class="energy-flow" d="M250,290 L345,356" fill="none" stroke="#ff6b6b" stroke-width="20"/>
-            <!-- Moteur Essence -->
             <g transform="translate(50,190)">
               <rect fill="#1e293b" height="100" rx="15" stroke="#ff6b6b" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(255,107,107,.5))" width="200"/>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="bold" text-anchor="middle" x="100" y="45">Moteur</text>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="bold" text-anchor="middle" x="100" y="80">Essence</text>
             </g>
-            <!-- Batterie -->
             <g transform="translate(500,20)">
               <rect fill="#1e293b" height="100" rx="15" stroke="#00d084" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(0,208,132,.5))" width="200"/>
               <rect fill="#00d084" height="40" rx="4" width="16" x="200" y="30"/>
               <text fill="#fff" font-family="Montserrat" font-size="32" font-weight="bold" text-anchor="middle" x="100" y="60">Batterie</text>
             </g>
-            <!-- Moteur Électrique -->
             <g transform="translate(500,190)">
               <rect fill="#1e293b" height="100" rx="15" stroke="#00d084" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(0,208,132,.5))" width="200"/>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="bold" text-anchor="middle" x="100" y="45">Moteur</text>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="bold" text-anchor="middle" x="100" y="80">Électrique</text>
             </g>
-            <!-- Roues -->
             <g transform="translate(300,380)">
               <rect fill="#1e293b" height="60" rx="10" stroke="#475569" stroke-width="6" width="200"/>
               <text fill="#fff" font-family="Montserrat" font-size="32" font-weight="bold" text-anchor="middle" x="100" y="40">Roues</text>
@@ -577,12 +525,9 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 6 — PHASE 4 : VITESSE RÉGULIÈRE                            -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 6 — PHASE 4 : VITESSE RÉGULIÈRE -->
     <div class="slide p-12">
       <div class="grid-overlay"></div>
-      <!-- header -->
       <div class="flex justify-between items-center mb-6 z-10 relative">
         <div>
           <div class="flex items-center mb-2">
@@ -592,9 +537,7 @@
         </div>
         <div class="text-right"><p class="text-6xl font-extrabold text-gray-700 opacity-40">04</p></div>
       </div>
-      <!-- content -->
       <div class="flex flex-1 gap-10 mt-2">
-        <!-- left -->
         <div class="w-1/3 flex flex-col justify-center">
           <div class="info-card p-8 rounded-2xl shadow-2xl">
             <div class="bg-gray-800 bg-opacity-80 p-6 rounded-xl mb-8 border-l-8 border-red-500 shadow-inner">
@@ -606,9 +549,7 @@
             </div>
           </div>
         </div>
-        <!-- right SVG -->
         <div class="w-2/3 info-card rounded-2xl relative flex items-center justify-center p-6 shadow-2xl overflow-hidden">
-          <!-- speedometer -->
           <div class="absolute top-6 right-6 bg-gray-900 p-4 rounded-xl border-2 border-gray-700 w-36 text-center shadow-lg z-10">
             <svg class="mx-auto" height="40" viewBox="0 0 100 50" width="100">
               <path class="speedometer-bg" d="M10,50 A40,40 0 0 1 90,50"/>
@@ -617,30 +558,25 @@
             <p class="text-xl font-bold text-white mt-2">110 km/h</p>
           </div>
           <svg height="500" viewBox="0 0 800 500" width="800" xmlns="http://www.w3.org/2000/svg">
-            <!-- Essence → Roues traction -->
             <path d="M230 250 L230 400 L400 400" fill="none" stroke="#334155" stroke-linejoin="round" stroke-width="12"/>
             <path class="energy-flow" d="M230 250 L230 400 L400 400" fill="none" stroke="#ff6b6b" stroke-linejoin="round" stroke-width="12"/>
             <rect fill="#0f1520" height="40" rx="8" stroke="#ff6b6b" stroke-width="2" width="120" x="170" y="326"/>
             <text fill="#ff6b6b" font-family="Montserrat" font-size="16" font-weight="bold" text-anchor="middle" x="230" y="352">AVANCE</text>
-            <!-- Essence → Batterie recharge -->
             <path d="M330 210 L600 210" fill="none" stroke="#334155" stroke-width="10"/>
             <path class="energy-flow-slow" d="M330 210 L600 210" fill="none" stroke="#00d084" stroke-width="10"/>
             <rect fill="#0f1520" height="40" rx="8" stroke="#00d084" stroke-width="2" width="130" x="400" y="190"/>
             <text fill="#00d084" font-family="Montserrat" font-size="16" font-weight="bold" text-anchor="middle" x="465" y="216">RECHARGE</text>
-            <!-- Moteur Essence -->
             <g transform="translate(80,160)">
               <rect fill="#1e293b" height="120" rx="16" stroke="#ff6b6b" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(255,107,107,.5))" width="250"/>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="800" text-anchor="middle" x="125" y="55">MOTEUR</text>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="800" text-anchor="middle" x="125" y="90">ESSENCE</text>
               <circle cx="220" cy="30" fill="#ff6b6b" r="10"><animate attributeName="opacity" dur="1s" repeatCount="indefinite" values="1;0.5;1"/></circle>
             </g>
-            <!-- Batterie -->
             <g transform="translate(560,160)">
               <rect fill="#1e293b" height="120" rx="16" stroke="#00d084" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(0,208,132,.5))" width="200"/>
               <rect fill="#00d084" height="60" rx="6" width="20" x="200" y="30"/>
               <text fill="#fff" font-family="Montserrat" font-size="28" font-weight="800" text-anchor="middle" x="100" y="70">BATTERIE</text>
             </g>
-            <!-- Roues -->
             <g transform="translate(400,360)">
               <rect fill="#1e293b" height="40" rx="10" stroke="#475569" stroke-width="6" width="160" x="-80" y="-20"/>
               <circle cx="-50" cy="40" fill="#1e293b" r="45" stroke="#ff6b6b" stroke-dasharray="10,10" stroke-width="8">
@@ -652,7 +588,6 @@
               <text fill="#fff" font-family="Montserrat" font-size="22" font-weight="800" text-anchor="middle" x="0" y="7">ROUES</text>
             </g>
           </svg>
-          <!-- legend -->
           <div class="absolute bottom-6 left-6 bg-gray-900 bg-opacity-90 p-4 rounded-xl border-2 border-gray-700 shadow-xl">
             <div class="flex items-center mb-3"><div class="w-8 h-3 bg-red-500 mr-3 rounded-full"></div><p class="text-lg font-bold text-white">Énergie pour rouler</p></div>
             <div class="flex items-center"><div class="w-8 h-3 bg-green-500 mr-3 rounded-full border-2 border-green-400 border-dashed"></div><p class="text-lg font-bold text-white">Énergie pour recharger</p></div>
@@ -661,12 +596,9 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 7 — PHASE 5 : FREINAGE RÉGÉNÉRATIF                         -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 7 — PHASE 5 : FREINAGE RÉGÉNÉRATIF -->
     <div class="slide p-12">
       <div class="grid-overlay"></div>
-      <!-- header -->
       <div class="flex justify-between items-center mb-6 z-10 relative">
         <div>
           <div class="flex items-center mb-2">
@@ -677,9 +609,7 @@
         </div>
         <div class="text-right"><p class="text-6xl font-bold text-gray-700 opacity-30">05</p></div>
       </div>
-      <!-- content -->
       <div class="flex flex-1 gap-8 mt-2">
-        <!-- left -->
         <div class="w-2/5 flex flex-col justify-center gap-6">
           <div class="info-card p-8 rounded-2xl">
             <h3 class="text-2xl font-bold text-white mb-4 border-b-2 border-gray-700 pb-3">Ce qu'il se passe</h3>
@@ -701,7 +631,6 @@
             </div>
           </div>
         </div>
-        <!-- right SVG -->
         <div class="w-3/5 info-card rounded-2xl relative flex items-center justify-center p-6">
           <div class="absolute top-6 left-6 bg-gray-900 px-4 py-2 rounded-lg text-sm font-bold text-green-400 border border-green-900 flex items-center">
             <i class="fas fa-charging-station mr-2"></i> EN RECHARGE
@@ -712,11 +641,8 @@
                 <path d="M0,0 L0,8 L8,4 z" fill="#00d084"/>
               </marker>
             </defs>
-            <!-- Wheels → Motor -->
             <path class="energy-flow" d="M400,380 L400,270" fill="none" marker-end="url(#ag2)" stroke="#00d084" stroke-width="12"/>
-            <!-- Motor → Battery -->
             <path class="energy-flow" d="M500,210 L590,210" fill="none" marker-end="url(#ag2)" stroke="#00d084" stroke-width="12"/>
-            <!-- Essence inactive -->
             <g transform="translate(40,150)">
               <rect fill="#0f172a" height="120" rx="16" stroke="#475569" stroke-width="4" opacity="0.5" width="200"/>
               <text fill="#64748b" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="100" y="55">Moteur</text>
@@ -724,7 +650,6 @@
               <rect fill="#0f172a" height="24" rx="12" stroke="#475569" stroke-width="2" width="80" x="60" y="105"/>
               <text fill="#64748b" font-family="Montserrat" font-size="12" font-weight="bold" text-anchor="middle" x="100" y="122">ARRÊTÉ</text>
             </g>
-            <!-- Moteur élec (générateur) -->
             <g transform="translate(300,150)">
               <rect fill="#1e293b" height="120" rx="16" stroke="#00d084" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(0,208,132,.4))" width="200"/>
               <text fill="#fff" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="100" y="55">Moteur</text>
@@ -732,13 +657,11 @@
               <rect fill="#0f1520" height="24" rx="12" stroke="#00d084" stroke-width="2" width="120" x="40" y="105"/>
               <text fill="#00d084" font-family="Montserrat" font-size="12" font-weight="bold" text-anchor="middle" x="100" y="122">GÉNÉRATEUR</text>
             </g>
-            <!-- Batterie charging -->
             <g transform="translate(560,150)">
               <rect fill="#1e293b" height="120" rx="16" stroke="#00d084" stroke-width="4" style="filter:drop-shadow(0 0 12px rgba(0,208,132,.4))" width="200"/>
               <rect fill="#00d084" height="40" rx="4" width="16" x="200" y="40"/>
               <text fill="#fff" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="100" y="65">Batterie</text>
             </g>
-            <!-- Roues -->
             <g transform="translate(300,380)">
               <rect fill="#1e293b" height="30" rx="8" stroke="#00d084" stroke-width="4" width="200"/>
               <circle cx="40" cy="45" fill="#0f1520" r="35" stroke="#00d084" stroke-dasharray="8,8" stroke-width="6">
@@ -751,7 +674,6 @@
               <path d="M40,45 L160,45" fill="none" stroke="#475569" stroke-width="8"/>
               <text fill="#fff" font-family="Montserrat" font-size="20" font-weight="bold" text-anchor="middle" x="100" y="110">ROUES</text>
             </g>
-            <!-- labels -->
             <rect fill="#0f1520" height="30" rx="8" stroke="#00d084" width="180" x="410" y="320"/>
             <text fill="#00d084" font-family="Montserrat" font-size="16" font-weight="bold" text-anchor="middle" x="500" y="340">1. L'énergie remonte</text>
             <rect fill="#0f1520" height="30" rx="8" stroke="#00d084" width="200" x="500" y="100"/>
@@ -761,12 +683,9 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 8 — PHASE 6 : À L'ARRÊT                                    -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 8 — PHASE 6 : À L'ARRÊT -->
     <div class="slide p-12">
       <div class="grid-overlay"></div>
-      <!-- header -->
       <div class="flex justify-between items-center mb-8 z-10 relative">
         <div>
           <div class="flex items-center mb-2">
@@ -776,9 +695,7 @@
         </div>
         <div class="text-right"><p class="text-6xl font-black text-gray-800 opacity-40">06</p></div>
       </div>
-      <!-- content -->
       <div class="flex flex-1 gap-12 mt-4">
-        <!-- left -->
         <div class="w-2/5 flex flex-col gap-6">
           <div class="info-card p-8">
             <div class="flex items-center mb-4"><i class="fas fa-stop-circle text-2xl text-red-400 mr-4"></i><h3 class="text-3xl font-bold text-white">Le moteur se coupe</h3></div>
@@ -793,16 +710,12 @@
             <p class="text-lg text-gray-300">La batterie prend le relais en silence pour faire fonctionner les accessoires de la voiture.</p>
           </div>
         </div>
-        <!-- right SVG -->
         <div class="w-3/5 info-card relative flex items-center justify-center p-6">
           <svg height="100%" viewBox="0 0 800 500" width="100%" xmlns="http://www.w3.org/2000/svg">
-            <!-- inactive conns -->
             <path d="M230,250 L350,250" fill="none" stroke="#475569" stroke-dasharray="10,10" stroke-width="6"/>
             <path d="M570,250 L450,250" fill="none" stroke="#475569" stroke-dasharray="10,10" stroke-width="6"/>
-            <!-- active: battery → accessories -->
             <path d="M400,380 L400,120" fill="none" stroke="#00d084" stroke-width="12"/>
             <polygon fill="#00d084" points="400,100 385,125 415,125"/>
-            <!-- Moteur Essence inactive -->
             <g transform="translate(50,200)">
               <rect fill="#0f172a" height="100" rx="15" stroke="#475569" stroke-width="4" opacity="0.8" width="180"/>
               <text fill="#94a3b8" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="90" y="45">MOTEUR</text>
@@ -810,7 +723,6 @@
               <rect fill="#ef4444" height="30" rx="15" width="80" x="50" y="-15"/>
               <text fill="white" font-family="Montserrat" font-size="16" font-weight="600" text-anchor="middle" x="90" y="5">ARRÊTÉ</text>
             </g>
-            <!-- Moteur Électrique inactive -->
             <g transform="translate(570,200)">
               <rect fill="#0f172a" height="100" rx="15" stroke="#475569" stroke-width="4" opacity="0.8" width="180"/>
               <text fill="#94a3b8" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="90" y="45">MOTEUR</text>
@@ -818,26 +730,22 @@
               <rect fill="#64748b" height="30" rx="15" width="80" x="50" y="-15"/>
               <text fill="white" font-family="Montserrat" font-size="16" font-weight="600" text-anchor="middle" x="90" y="5">EN PAUSE</text>
             </g>
-            <!-- Roues inactive -->
             <g transform="translate(350,200)">
               <rect fill="#0f172a" height="100" rx="50" stroke="#475569" stroke-width="4" opacity="0.8" width="100"/>
               <text fill="#94a3b8" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="50" y="58">ROUES</text>
               <text fill="#ef4444" font-family="Montserrat" font-size="16" font-weight="600" text-anchor="middle" x="50" y="130">IMMOBILES</text>
             </g>
-            <!-- Batterie source -->
             <g transform="translate(300,380)">
               <rect fill="#0f172a" height="90" rx="15" stroke="#475569" stroke-width="4" opacity="0.8" width="200"/>
               <text fill="#94a3b8" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="100" y="55">BATTERIE</text>
               <rect fill="#00d084" height="10" rx="5" width="140" x="30" y="70"/>
             </g>
-            <!-- Accessoires active -->
             <g transform="translate(300,10)">
               <rect fill="#064e3b" height="90" rx="15" stroke="#00d084" stroke-width="4" width="200"/>
               <text fill="#ffffff" font-family="Montserrat" font-size="22" font-weight="700" text-anchor="middle" x="100" y="40">ACCESSOIRES</text>
               <text fill="#a7f3d0" font-family="Montserrat" font-size="16" font-weight="600" text-anchor="middle" x="100" y="65">(Radio, Clim, Feux)</text>
             </g>
           </svg>
-          <!-- legend -->
           <div class="absolute bottom-6 left-6 bg-gray-900 bg-opacity-80 p-4 rounded-xl border border-gray-700">
             <div class="flex items-center mb-3"><div class="w-8 h-2 bg-green-500 mr-3 rounded"></div><p class="text-lg text-white font-bold">Énergie électrique</p></div>
             <div class="flex items-center"><div class="w-8 h-2 bg-gray-600 mr-3 rounded"></div><p class="text-lg text-gray-400 font-bold">Éteint / Inactif</p></div>
@@ -846,12 +754,9 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 9 — BILAN : POURQUOI C'EST UTILE ?                         -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 9 — BILAN -->
     <div class="slide p-12">
       <div class="grid-overlay"></div>
-      <!-- header -->
       <div class="flex justify-between items-center mb-10 z-10 relative flex-shrink-0">
         <div>
           <div class="flex items-center mb-2">
@@ -862,7 +767,6 @@
         </div>
         <div class="text-right"><p class="text-5xl font-bold text-gray-700 opacity-30">09</p></div>
       </div>
-      <!-- grid -->
       <div class="flex-1 relative z-10 grid grid-cols-2 grid-rows-2 gap-8 pb-6">
         <div class="info-card p-8 flex items-center border-l-8 border-blue-500">
           <div class="big-icon-circle bg-blue-900 bg-opacity-30 text-blue-500 mr-8 flex-shrink-0"><i class="fas fa-gas-pump"></i></div>
@@ -883,18 +787,14 @@
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════════════ -->
-    <!-- SLIDE 10 — RÉSUMÉ                                                 -->
-    <!-- ══════════════════════════════════════════════════════════════════ -->
+    <!-- SLIDE 10 — RÉSUMÉ -->
     <div class="slide p-12 flex flex-col">
-      <!-- header -->
       <div class="mb-10 z-10 relative flex justify-between items-center">
         <h2 class="text-6xl font-extrabold tracking-tight">Résumé</h2>
         <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center">
           <i class="fas fa-flag-checkered text-3xl text-white"></i>
         </div>
       </div>
-      <!-- timeline -->
       <div class="flex-1 flex flex-col justify-center relative z-10 mb-8 mt-4">
         <div class="relative w-full px-2">
           <div class="connector-line"></div>
@@ -944,7 +844,6 @@
           </div>
         </div>
       </div>
-      <!-- bottom box -->
       <div class="bg-gray-800 border-4 border-green-500 rounded-2xl p-8 flex justify-center items-center mt-auto shadow-2xl">
         <i class="fas fa-lightbulb text-6xl text-yellow-400 mr-8 drop-shadow-lg"></i>
         <p class="text-4xl font-extrabold text-white tracking-wide">Une voiture hybride choisit le bon moteur au bon moment.</p>
@@ -958,18 +857,41 @@
   const TOTAL = 10;
   let current = 0;
 
-  /* ── scaling ─────────────────────────────────────────────────────────── */
-  const scaler = document.getElementById('scaler');
+  /* ── CORRECTION CADRAGE ──────────────────────────────────────────────────
+     Problème original : transform: scale() ne modifie pas le flux DOM.
+     Le #scaler (1280×720) gardait son emprise réelle même après réduction,
+     décalant le centrage flexbox et créant des barres de défilement ou
+     un mauvais alignement visuel.
+
+     Solution :
+     - #viewport est un conteneur relatif (overflow:hidden, pas de flex)
+     - #scaler est positionné en absolute top:0 left:0, transform-origin: top left
+     - On calcule le facteur d'échelle s = min(vw/1280, vh/720)
+     - On calcule les offsets pour centrer le bloc mis à l'échelle :
+         offsetX = (vw - 1280 * s) / 2
+         offsetY = (vh - 720  * s) / 2
+     - On applique : transform = translate(offsetX, offsetY) scale(s)
+     → L'élément reste à top:0/left:0 dans le DOM (pas d'impact sur le layout),
+       mais est visuellement centré et à l'échelle correcte dans tous les cas.
+  ─────────────────────────────────────────────────────────────────────────── */
+
+  const SLIDE_W = 1280;
+  const SLIDE_H = 720;
+  const scaler  = document.getElementById('scaler');
+
   function rescale() {
-    const sx = window.innerWidth  / 1280;
-    const sy = window.innerHeight / 720;
-    const s  = Math.min(sx, sy);
-    scaler.style.transform = `scale(${s})`;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const s  = Math.min(vw / SLIDE_W, vh / SLIDE_H);
+    const ox = (vw - SLIDE_W * s) / 2;
+    const oy = (vh - SLIDE_H * s) / 2;
+    scaler.style.transform = `translate(${ox}px, ${oy}px) scale(${s})`;
   }
+
   window.addEventListener('resize', rescale);
   rescale();
 
-  /* ── dots ────────────────────────────────────────────────────────────── */
+  /* ── DOTS ────────────────────────────────────────────────────────────── */
   const dotsEl = document.getElementById('dots');
   for (let i = 0; i < TOTAL; i++) {
     const d = document.createElement('div');
@@ -978,7 +900,7 @@
     dotsEl.appendChild(d);
   }
 
-  /* ── navigation ──────────────────────────────────────────────────────── */
+  /* ── NAVIGATION ──────────────────────────────────────────────────────── */
   function goTo(n) {
     const slides = document.querySelectorAll('.slide');
     slides[current].classList.remove('active');
@@ -988,14 +910,15 @@
     dotsEl.children[current].classList.add('active');
     document.getElementById('slide-counter').textContent = `${current + 1} / ${TOTAL}`;
   }
+
   function changeSlide(dir) { goTo(current + dir); }
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown')  changeSlide(1);
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')    changeSlide(-1);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changeSlide(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changeSlide(-1);
   });
 
-  /* ── init ────────────────────────────────────────────────────────────── */
+  /* ── INIT ────────────────────────────────────────────────────────────── */
   goTo(0);
 </script>
 </body>

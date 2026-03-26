@@ -12,7 +12,8 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   html, body {
-    width: 100%; height: 100%;
+    width: 100vw; height: 100vh;
+    max-width: 100vw; max-height: 100vh;
     background: #0a0f1a;
     overflow: hidden;
     font-family: 'Montserrat', sans-serif;
@@ -27,19 +28,19 @@
      mais est visuellement centré et à l'échelle correcte.
   ─────────────────────────────────────────────────────────────────────────── */
   #viewport {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
     overflow: hidden;
+    background: #0a0f1a;
   }
 
   #scaler {
     width: 1280px;
     height: 720px;
-    transform-origin: top left;
-    position: absolute;
-    top: 0;
-    left: 0;
+    transform-origin: center center;
+    flex-shrink: 0;
   }
 
   .slide {
@@ -857,38 +858,27 @@
   const TOTAL = 10;
   let current = 0;
 
-  /* ── CORRECTION CADRAGE ──────────────────────────────────────────────────
-     Problème original : transform: scale() ne modifie pas le flux DOM.
-     Le #scaler (1280×720) gardait son emprise réelle même après réduction,
-     décalant le centrage flexbox et créant des barres de défilement ou
-     un mauvais alignement visuel.
-
-     Solution :
-     - #viewport est un conteneur relatif (overflow:hidden, pas de flex)
-     - #scaler est positionné en absolute top:0 left:0, transform-origin: top left
-     - On calcule le facteur d'échelle s = min(vw/1280, vh/720)
-     - On calcule les offsets pour centrer le bloc mis à l'échelle :
-         offsetX = (vw - 1280 * s) / 2
-         offsetY = (vh - 720  * s) / 2
-     - On applique : transform = translate(offsetX, offsetY) scale(s)
-     → L'élément reste à top:0/left:0 dans le DOM (pas d'impact sur le layout),
-       mais est visuellement centré et à l'échelle correcte dans tous les cas.
+  /* ── CADRAGE ─────────────────────────────────────────────────────────────
+     Le #viewport est un grid avec place-items:center → le navigateur centre
+     automatiquement le #scaler (1280×720) dans la fenêtre.
+     On applique juste un scale() depuis le centre : plus d'offset à calculer,
+     plus de risque de décalage.
+     document.documentElement.clientWidth/clientHeight = taille de la zone
+     de rendu réelle, sans les barres de défilement, fiable partout.
   ─────────────────────────────────────────────────────────────────────────── */
 
-  const SLIDE_W = 1280;
-  const SLIDE_H = 720;
-  const scaler  = document.getElementById('scaler');
+  const SLIDE_W  = 1280;
+  const SLIDE_H  = 720;
+  const scaler   = document.getElementById('scaler');
 
   function rescale() {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
     const s  = Math.min(vw / SLIDE_W, vh / SLIDE_H);
-    const ox = (vw - SLIDE_W * s) / 2;
-    const oy = (vh - SLIDE_H * s) / 2;
-    scaler.style.transform = `translate(${ox}px, ${oy}px) scale(${s})`;
+    scaler.style.transform = `scale(${s})`;
   }
 
-  window.addEventListener('resize', rescale);
+  new ResizeObserver(rescale).observe(document.documentElement);
   rescale();
 
   /* ── DOTS ────────────────────────────────────────────────────────────── */

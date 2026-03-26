@@ -30,17 +30,15 @@
   #viewport {
     position: fixed;
     inset: 0;
-    display: grid;
-    place-items: center;
     overflow: hidden;
     background: #0a0f1a;
   }
 
   #scaler {
+    position: absolute;
     width: 1280px;
     height: 720px;
-    transform-origin: center center;
-    flex-shrink: 0;
+    transform-origin: top left;
   }
 
   .slide {
@@ -859,26 +857,29 @@
   let current = 0;
 
   /* ── CADRAGE ─────────────────────────────────────────────────────────────
-     Le #viewport est un grid avec place-items:center → le navigateur centre
-     automatiquement le #scaler (1280×720) dans la fenêtre.
-     On applique juste un scale() depuis le centre : plus d'offset à calculer,
-     plus de risque de décalage.
-     document.documentElement.clientWidth/clientHeight = taille de la zone
-     de rendu réelle, sans les barres de défilement, fiable partout.
+     Centrage via left/top (propriétés de layout) + scale() pur.
+     On sépare complètement le positionnement (left/top) de la mise à
+     l'échelle (scale), ce qui évite tout conflit transform-origin / translate.
+
+     left  = (largeur_fenêtre  - 1280 × s) / 2
+     top   = (hauteur_fenêtre  -  720 × s) / 2
+     scale = s    (transform-origin: top left)
   ─────────────────────────────────────────────────────────────────────────── */
 
-  const SLIDE_W  = 1280;
-  const SLIDE_H  = 720;
-  const scaler   = document.getElementById('scaler');
+  const SLIDE_W = 1280;
+  const SLIDE_H = 720;
+  const scaler  = document.getElementById('scaler');
 
   function rescale() {
-    const vw = document.documentElement.clientWidth;
-    const vh = document.documentElement.clientHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
     const s  = Math.min(vw / SLIDE_W, vh / SLIDE_H);
+    scaler.style.left      = Math.round((vw - SLIDE_W * s) / 2) + 'px';
+    scaler.style.top       = Math.round((vh - SLIDE_H * s) / 2) + 'px';
     scaler.style.transform = `scale(${s})`;
   }
 
-  new ResizeObserver(rescale).observe(document.documentElement);
+  window.addEventListener('resize', rescale);
   rescale();
 
   /* ── DOTS ────────────────────────────────────────────────────────────── */
